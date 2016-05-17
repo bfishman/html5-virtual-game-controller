@@ -3,7 +3,9 @@
 
 	var PI2 = Math.PI * 2;
 
-	var requestAnimationFrame, cancelAnimationFrame;
+	var animationRequestID;
+	var hidden = false;
+	//var requestAnimationFrame, cancelAnimationFrame;
 	var __hasProp = {}.hasOwnProperty;
 	var __extends = function(child, parent) {
 		for (var key in parent) {
@@ -662,6 +664,25 @@
 			}
 		},
 
+		show: function(){
+			if (this.hidden){
+				this.hidden = false;
+				this.render();
+			}
+		},
+		hide: function(){
+			if (!this.hidden){
+				var bound = this.bound;
+				this.ctx.clearRect(
+					bound.left,
+					bound.top,
+					bound.right - bound.left,
+					bound.bottom - bound.top
+				);
+				cancelAnimationFrame(animationRequestID);
+				this.hidden = true;
+			}
+		},
 		render: function() {
 			var bound = this.bound;
 			if( ! this.paused || ! this.performanceFriendly ){
@@ -727,7 +748,7 @@
 			// looking better for some reason)
 			// Process all the info for each touchable area
 			if( !this.paused || !this.performanceFriendly ) this.renderAreas();
-			requestAnimationFrame(this.renderWrapper);
+			animationRequestID = requestAnimationFrame(this.renderWrapper);
 		},
 		/**
 		 * So we can keep scope, and don't have to create a new obj every
@@ -1146,11 +1167,15 @@
 	 * Shim for requestAnimationFrame
 	 */
 	(function() {
+
+		console.log("requestAnimationFrame?");
+		console.log(requestAnimationFrame);
+
 	  if (typeof module !== 'undefined') return;
 		var lastTime = 0;
 		var vendors = ['ms', 'moz', 'webkit', 'o'];
-		requestAnimationFrame = window.requestAnimationFrame;
-		cancelAnimationFrame = window.cancelAnimationFrame;
+		var requestAnimationFrame = window.requestAnimationFrame;
+		var cancelAnimationFrame = window.cancelAnimationFrame;
 		for( var x = 0; x < vendors.length && !requestAnimationFrame; ++x ){
 			requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
 			cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] ||
